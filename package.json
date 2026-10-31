@@ -1,0 +1,35 @@
+{
+  "name": "@todebaran/theme-kit",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The Todebaran theme format and everything derived from it: surfaces, accent roles, readability, colour facets, likeness. Shared by the desktop app, the community worker and the admin console.",
+  "type": "module",
+  "sideEffects": false,
+  "files": ["dist", "src"],
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
+    "./accent": { "types": "./dist/accent.d.ts", "default": "./dist/accent.js" },
+    "./accent-roles": { "types": "./dist/accentRoles.d.ts", "default": "./dist/accentRoles.js" },
+    "./colors": { "types": "./dist/colors.d.ts", "default": "./dist/colors.js" },
+    "./facets": { "types": "./dist/facets.d.ts", "default": "./dist/facets.js" },
+    "./material": { "types": "./dist/material.d.ts", "default": "./dist/material.js" },
+    "./mode": { "types": "./dist/mode.d.ts", "default": "./dist/mode.js" },
+    "./palette": { "types": "./dist/palette.d.ts", "default": "./dist/palette.js" },
+    "./readability": { "types": "./dist/readability.d.ts", "default": "./dist/readability.js" },
+    "./similarity": { "types": "./dist/similarity.d.ts", "default": "./dist/similarity.js" },
+    "./submission": { "types": "./dist/submission.d.ts", "default": "./dist/submission.js" },
+    "./surfaces": { "types": "./dist/surfaces.d.ts", "default": "./dist/surfaces.js" },
+    "./theme-file": { "types": "./dist/themeFile.d.ts", "default": "./dist/themeFile.js" }
+  },
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "check:dist": "pnpm build && git diff --exit-code -- dist"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.0",
+    "vitest": "^4.1.9"
+  },
+  "packageManager": "pnpm@10.12.1"
+}
