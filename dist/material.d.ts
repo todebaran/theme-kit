@@ -7,23 +7,10 @@ export interface ThemeMaterial {
     lift: number;
 }
 export declare const MATERIAL_DEFAULTS: ThemeMaterial;
-/** What older themes set instead of a material: `depth` moved the frame and the cards together. */
-export interface LegacyMaterial {
-    tone?: number;
-    depth?: number;
-}
 /** The fields of a material that `raw` sets validly; nothing else. */
 export declare function parseMaterial(raw: unknown): Partial<ThemeMaterial>;
-/** What an older theme's `tone` and `depth` meant: `depth` moved the frame and the cards together. */
-export declare function materialFromLegacy(legacy: {
-    tone?: unknown;
-    depth?: unknown;
-}): Partial<ThemeMaterial>;
-/**
- * A theme's material in full: what it sets, then what an older theme set,
- * then the defaults. Read, never rewritten: a stored theme keeps its shape.
- */
+/** A theme's material in full: what it sets, the defaults for the rest. */
 export declare function resolveMaterial(theme: {
     material?: Partial<ThemeMaterial>;
-} & LegacyMaterial): ThemeMaterial;
+}): ThemeMaterial;
 //# sourceMappingURL=material.d.ts.map

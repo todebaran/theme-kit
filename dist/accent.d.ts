@@ -1,11 +1,6 @@
 import { type AppColorId, type Oklch } from './colors.js';
 import type { ResolvedThemeMode } from './mode.js';
 /**
- * The user's own accent: a hue and how colourful it is. The lightness is not
- * chosen — it follows the mode, as the palette's does, so a custom colour can
- * never vanish on one of the two.
- */
-/**
  * How a custom accent's fills (a button, a checked box) differ from what each
  * mode draws: light mode draws them deep under light text, dark mode bright
  * under dark text. Each flag turns one mode the other way — a true yellow in
@@ -18,6 +13,11 @@ export interface AccentFills {
     /** Dark mode: a deep fill under light text. */
     deepInDark?: true;
 }
+/**
+ * The user's own accent: a hue and how colourful it is. The lightness is not
+ * chosen — it follows the mode, as the palette's does, so a custom colour can
+ * never vanish on one of the two.
+ */
 export interface CustomAccent extends AccentFills {
     kind: 'custom';
     /** OKLCH hue, degrees 0–360. */
@@ -48,15 +48,9 @@ export declare function customAccent(hue: number, chroma: number, fills?: {
 export declare function accentSeed(color: AccentColor, mode: ResolvedThemeMode): Oklch;
 /** The accent as the sRGB hex it is drawn in, in a mode. */
 export declare function accentHex(color: AccentColor, mode: ResolvedThemeMode): string;
-/** A custom accent from a colour picked by value — its hue and chroma; its lightness the mode's. */
-export declare function customAccentFromHex(hex: string): CustomAccent | null;
 export declare function sameAccent(a: AccentSetting, b: AccentSetting): boolean;
-/**
- * An accent colour as stored, or as older versions stored it: the object, a
- * palette id (an old palette's too), or a hex — which keeps its hue and
- * chroma and takes the mode's lightness. Null for anything else.
- */
+/** An accent colour as stored — a palette colour or a custom one — or null for anything else. */
 export declare function parseAccentColor(value: unknown): AccentColor | null;
-/** The accent setting as stored, or as older versions stored it ({@link parseAccentColor}). */
+/** The accent setting as stored: the theme's own accent, or a colour ({@link parseAccentColor}). */
 export declare function parseAccentSetting(value: unknown): AccentSetting | null;
 //# sourceMappingURL=accent.d.ts.map

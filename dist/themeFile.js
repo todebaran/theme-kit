@@ -6,15 +6,13 @@
 // where the theme came from; the gallery stores exactly this, once per mode.
 import { parseAccentColor } from './accent.js';
 import { hexToRgb, rgbToHex } from './colors.js';
-import { materialFromLegacy, parseMaterial, resolveMaterial } from './material.js';
+import { parseMaterial, resolveMaterial } from './material.js';
 import { isResolvedThemeMode } from './mode.js';
 /**
- * Bumped when the on-disk theme shape changes. 2: the accent is an accent
- * colour (a palette id or the user's hue) instead of a hex — version 1 files
- * still import, their hex taken as a custom hue. 3: a material instead of
- * `tone` and `depth` — older files still import, theirs read as one.
+ * The on-disk theme shape. Bump it when the shape changes, and teach
+ * `readThemeFile` to read the version before.
  */
-export const THEME_FILE_VERSION = 3;
+export const THEME_FILE_VERSION = 1;
 /** Recommended file extension for exported themes. */
 export const THEME_FILE_EXTENSION = 'json';
 /** The canonical file object of a theme: only the keys a theme has, the background as `#rrggbb`. */
@@ -35,8 +33,8 @@ export function serializeTheme(theme) {
 }
 /**
  * Reads a theme out of a parsed file object, as forgiving as an import should
- * be: older versions' shapes, a missing name, a partial material. Null for
- * anything that is not a theme.
+ * be: a missing name, a partial material. Null for anything that is not a
+ * theme.
  */
 export function readThemeFile(data) {
     if (typeof data !== 'object' || data === null)
@@ -50,8 +48,7 @@ export function readThemeFile(data) {
     if (!accent)
         return null;
     const name = typeof obj.name === 'string' && obj.name.trim() ? obj.name : 'Imported Theme';
-    // A version 2 file's `tone` and `depth`, read as the material they meant.
-    const material = { ...materialFromLegacy(obj), ...parseMaterial(obj.material) };
+    const material = parseMaterial(obj.material);
     return {
         name,
         mode: obj.mode,

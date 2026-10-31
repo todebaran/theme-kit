@@ -2,10 +2,10 @@
 //
 // A theme somebody wants to share, checked by the rules the gallery keeps.
 //
-// Strict where an import is forgiving (themeFile.ts): an import should open
-// whatever a person's own old file holds, while a submission is public text
-// from a stranger. So nothing is guessed, nothing legacy is accepted, and what
-// comes out is re-serialized from the known keys only — anything else the
+// Strict where an import is forgiving (themeFile.ts): an import fills in a
+// missing name or material, while a submission is public text from a stranger.
+// So nothing is guessed — the whole material, a custom hue within range — and
+// what comes out is re-serialized from the known keys only: anything else the
 // sender put in the JSON is dropped rather than stored and served to everyone.
 //
 // The app runs the same function before it sends anything, so a refusal is
@@ -65,7 +65,6 @@ function strictAccent(raw: unknown): AccentColor | null {
   if (typeof raw !== 'object' || raw === null) return null
   const obj = raw as Record<string, unknown>
   if (obj.kind === 'palette') {
-    // The palette as it is now: an id of the old palette is an import's business.
     return typeof obj.id === 'string' && isAppColorId(obj.id) ? paletteAccent(obj.id) : null
   }
   if (obj.kind === 'custom') {

@@ -21,16 +21,8 @@ export function parseMaterial(raw) {
     };
     return Object.fromEntries(Object.entries(parsed).filter(([, value]) => value !== undefined));
 }
-/** What an older theme's `tone` and `depth` meant: `depth` moved the frame and the cards together. */
-export function materialFromLegacy(legacy) {
-    const depth = unit(legacy.depth);
-    return parseMaterial({ tone: legacy.tone, ...(depth !== undefined ? { frame: depth, lift: depth } : {}) });
-}
-/**
- * A theme's material in full: what it sets, then what an older theme set,
- * then the defaults. Read, never rewritten: a stored theme keeps its shape.
- */
+/** A theme's material in full: what it sets, the defaults for the rest. */
 export function resolveMaterial(theme) {
-    return { ...MATERIAL_DEFAULTS, ...materialFromLegacy(theme), ...parseMaterial(theme.material) };
+    return { ...MATERIAL_DEFAULTS, ...parseMaterial(theme.material) };
 }
 //# sourceMappingURL=material.js.map

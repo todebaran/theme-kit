@@ -2,27 +2,11 @@
 //
 // What an accent IS, as data: a colour of the palette, or the user's own hue.
 // Neither is a fixed sRGB value — each becomes one per mode (accentSeed), so
-// the same choice reads right on a light and on a dark theme. Pure: shared by
-// the main process (first paint) and every renderer window.
+// the same choice reads right on a light and on a dark theme.
 
-import {
-  APP_COLORS,
-  type AppColorId,
-  type ColorTone,
-  type Oklch,
-  hexToRgb,
-  oklchToRgb,
-  resolveColorId,
-  rgbToHex,
-  rgbToOklch,
-} from './colors.js'
+import { APP_COLORS, type AppColorId, type ColorTone, type Oklch, isAppColorId, oklchToRgb, rgbToHex } from './colors.js'
 import type { ResolvedThemeMode } from './mode.js'
 
-/**
- * The user's own accent: a hue and how colourful it is. The lightness is not
- * chosen — it follows the mode, as the palette's does, so a custom colour can
- * never vanish on one of the two.
- */
 /**
  * How a custom accent's fills (a button, a checked box) differ from what each
  * mode draws: light mode draws them deep under light text, dark mode bright
@@ -37,6 +21,11 @@ export interface AccentFills {
   deepInDark?: true
 }
 
+/**
+ * The user's own accent: a hue and how colourful it is. The lightness is not
+ * chosen — it follows the mode, as the palette's does, so a custom colour can
+ * never vanish on one of the two.
+ */
 export interface CustomAccent extends AccentFills {
   kind: 'custom'
   /** OKLCH hue, degrees 0–360. */
@@ -109,14 +98,6 @@ export function accentHex(color: AccentColor, mode: ResolvedThemeMode): string {
   return rgbToHex(oklchToRgb(accentSeed(color, mode)))
 }
 
-/** A custom accent from a colour picked by value — its hue and chroma; its lightness the mode's. */
-export function customAccentFromHex(hex: string): CustomAccent | null {
-  const rgb = hexToRgb(hex)
-  if (!rgb) return null
-  const { C, h } = rgbToOklch(rgb)
-  return customAccent(h, C)
-}
-
 export function sameAccent(a: AccentSetting, b: AccentSetting): boolean {
   if (a.kind === 'theme') return b.kind === 'theme'
   if (a.kind === 'palette') return b.kind === 'palette' && a.id === b.id
@@ -129,23 +110,12 @@ export function sameAccent(a: AccentSetting, b: AccentSetting): boolean {
   )
 }
 
-/**
- * An accent colour as stored, or as older versions stored it: the object, a
- * palette id (an old palette's too), or a hex — which keeps its hue and
- * chroma and takes the mode's lightness. Null for anything else.
- */
+/** An accent colour as stored — a palette colour or a custom one — or null for anything else. */
 export function parseAccentColor(value: unknown): AccentColor | null {
-  if (typeof value === 'string') {
-    const id = resolveColorId(value)
-    if (id) return paletteAccent(id)
-    return customAccentFromHex(value)
-  }
   if (typeof value !== 'object' || value === null) return null
-
   const obj = value as Record<string, unknown>
-  if (obj.kind === 'palette' && typeof obj.id === 'string') {
-    const id = resolveColorId(obj.id)
-    return id ? paletteAccent(id) : null
+  if (obj.kind === 'palette') {
+    return typeof obj.id === 'string' && isAppColorId(obj.id) ? paletteAccent(obj.id) : null
   }
   if (obj.kind === 'custom' && typeof obj.hue === 'number' && typeof obj.chroma === 'number') {
     if (!Number.isFinite(obj.hue) || !Number.isFinite(obj.chroma)) return null
@@ -154,12 +124,8 @@ export function parseAccentColor(value: unknown): AccentColor | null {
   return null
 }
 
-/** The value older versions stored for "the theme's own accent". */
-const LEGACY_THEME_ACCENT = 'THEME_DEFAULT'
-
-/** The accent setting as stored, or as older versions stored it ({@link parseAccentColor}). */
+/** The accent setting as stored: the theme's own accent, or a colour ({@link parseAccentColor}). */
 export function parseAccentSetting(value: unknown): AccentSetting | null {
-  if (value === LEGACY_THEME_ACCENT) return THEME_ACCENT
   if (typeof value === 'object' && value !== null && (value as { kind?: unknown }).kind === 'theme') return THEME_ACCENT
   return parseAccentColor(value)
 }

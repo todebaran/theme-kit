@@ -2,21 +2,6 @@ import { describe, expect, it } from 'vitest'
 import { THEME_ACCENT, accentHex, accentSeed, customAccent, parseAccentColor, parseAccentSetting, sameAccent } from './accent.js'
 
 describe('parseAccentSetting', () => {
-  it('reads what older versions stored', () => {
-    expect(parseAccentSetting('THEME_DEFAULT')).toEqual(THEME_ACCENT)
-    expect(parseAccentSetting('blue')).toEqual({ kind: 'palette', id: 'blue' })
-    // A colour of the old palette, as its successor.
-    expect(parseAccentSetting('gold')).toEqual({ kind: 'palette', id: 'brass' })
-  })
-
-  it('takes a legacy hex as a custom hue', () => {
-    const accent = parseAccentSetting('#ff00ff')
-    expect(accent?.kind).toBe('custom')
-    if (accent?.kind !== 'custom') return
-    expect(accent.hue).toBeGreaterThan(320)
-    expect(accent.hue).toBeLessThan(335)
-  })
-
   it('reads today’s shape back as it was written', () => {
     const custom = customAccent(200, 0.1)
     expect(parseAccentSetting(custom)).toEqual(custom)
@@ -25,7 +10,9 @@ describe('parseAccentSetting', () => {
   })
 
   it('is null for anything else', () => {
-    expect(parseAccentSetting('not a colour')).toBeNull()
+    // Only the stored shape: a bare palette id or a hex is not an accent.
+    expect(parseAccentSetting('blue')).toBeNull()
+    expect(parseAccentSetting('#ff00ff')).toBeNull()
     expect(parseAccentSetting({ kind: 'palette', id: 'ultraviolet' })).toBeNull()
     expect(parseAccentSetting({ kind: 'custom', hue: 'red', chroma: 1 })).toBeNull()
     expect(parseAccentSetting(42)).toBeNull()

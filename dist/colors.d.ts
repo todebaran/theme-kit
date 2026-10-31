@@ -267,20 +267,8 @@ export declare const APP_COLORS: readonly [{
     };
 }];
 export type AppColorId = (typeof APP_COLORS)[number]['id'];
-/**
- * Colours of the palette before it was cut down to the one above, each with
- * its successor. Folders, projects, tags and highlights keep the id they were
- * given — in synced data, which a device on an older version still writes —
- * so an old id is translated where it is read ({@link resolveColorId}), never
- * rewritten where it is stored.
- */
-export declare const LEGACY_COLOR_ALIASES: Readonly<Record<string, AppColorId>>;
 export declare function isAppColorId(id: string): id is AppColorId;
-/**
- * The palette colour a stored colour id stands for: itself, its successor if
- * it is an id of the old palette, or null for no colour or an id the palette
- * never had.
- */
+/** The palette colour a stored colour id names, or null for no colour or an id the palette does not have. */
 export declare function resolveColorId(id: string | null | undefined): AppColorId | null;
 export type AppColor = (typeof APP_COLORS)[number];
 /** The palette colour with this id, after {@link resolveColorId}. */

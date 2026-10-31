@@ -7,11 +7,11 @@
 
 import { type AccentColor, parseAccentColor } from './accent.js'
 import { hexToRgb, rgbToHex } from './colors.js'
-import { type LegacyMaterial, type ThemeMaterial, materialFromLegacy, parseMaterial, resolveMaterial } from './material.js'
+import { type ThemeMaterial, parseMaterial, resolveMaterial } from './material.js'
 import { type ResolvedThemeMode, isResolvedThemeMode } from './mode.js'
 
 /** A theme as a description of how it looks — no identity, no origin. */
-export interface ThemeSpec extends LegacyMaterial {
+export interface ThemeSpec {
   /** Display name shown in theme pickers. */
   name: string
   mode: ResolvedThemeMode
@@ -19,21 +19,15 @@ export interface ThemeSpec extends LegacyMaterial {
   background: string
   /** The accent the theme comes with — applied while the accent setting follows the theme. */
   accent: AccentColor
-  /**
-   * How its surfaces are made from the background (material.ts): what it sets,
-   * the rest default. Older themes set `tone` and `depth` instead
-   * (LegacyMaterial) — read through `resolveMaterial`, never rewritten.
-   */
+  /** How its surfaces are made from the background (material.ts): what it sets, the rest default. */
   material?: Partial<ThemeMaterial>
 }
 
 /**
- * Bumped when the on-disk theme shape changes. 2: the accent is an accent
- * colour (a palette id or the user's hue) instead of a hex — version 1 files
- * still import, their hex taken as a custom hue. 3: a material instead of
- * `tone` and `depth` — older files still import, theirs read as one.
+ * The on-disk theme shape. Bump it when the shape changes, and teach
+ * `readThemeFile` to read the version before.
  */
-export const THEME_FILE_VERSION = 3
+export const THEME_FILE_VERSION = 1
 
 /** Recommended file extension for exported themes. */
 export const THEME_FILE_EXTENSION = 'json'
@@ -68,8 +62,8 @@ export function serializeTheme(theme: ThemeSpec): string {
 
 /**
  * Reads a theme out of a parsed file object, as forgiving as an import should
- * be: older versions' shapes, a missing name, a partial material. Null for
- * anything that is not a theme.
+ * be: a missing name, a partial material. Null for anything that is not a
+ * theme.
  */
 export function readThemeFile(data: unknown): ThemeSpec | null {
   if (typeof data !== 'object' || data === null) return null
@@ -82,8 +76,7 @@ export function readThemeFile(data: unknown): ThemeSpec | null {
 
   const name = typeof obj.name === 'string' && obj.name.trim() ? obj.name : 'Imported Theme'
 
-  // A version 2 file's `tone` and `depth`, read as the material they meant.
-  const material = { ...materialFromLegacy(obj), ...parseMaterial(obj.material) }
+  const material = parseMaterial(obj.material)
 
   return {
     name,

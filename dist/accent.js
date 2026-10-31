@@ -2,9 +2,8 @@
 //
 // What an accent IS, as data: a colour of the palette, or the user's own hue.
 // Neither is a fixed sRGB value — each becomes one per mode (accentSeed), so
-// the same choice reads right on a light and on a dark theme. Pure: shared by
-// the main process (first paint) and every renderer window.
-import { APP_COLORS, hexToRgb, oklchToRgb, resolveColorId, rgbToHex, rgbToOklch, } from './colors.js';
+// the same choice reads right on a light and on a dark theme.
+import { APP_COLORS, isAppColorId, oklchToRgb, rgbToHex } from './colors.js';
 export const THEME_ACCENT = { kind: 'theme' };
 /** The chroma a custom accent can take: from barely tinted to as vivid as the palette goes. */
 export const CUSTOM_CHROMA = { min: 0.02, max: 0.24 };
@@ -53,14 +52,6 @@ export function accentSeed(color, mode) {
 export function accentHex(color, mode) {
     return rgbToHex(oklchToRgb(accentSeed(color, mode)));
 }
-/** A custom accent from a colour picked by value — its hue and chroma; its lightness the mode's. */
-export function customAccentFromHex(hex) {
-    const rgb = hexToRgb(hex);
-    if (!rgb)
-        return null;
-    const { C, h } = rgbToOklch(rgb);
-    return customAccent(h, C);
-}
 export function sameAccent(a, b) {
     if (a.kind === 'theme')
         return b.kind === 'theme';
@@ -72,24 +63,13 @@ export function sameAccent(a, b) {
         !a.brightInLight === !b.brightInLight &&
         !a.deepInDark === !b.deepInDark);
 }
-/**
- * An accent colour as stored, or as older versions stored it: the object, a
- * palette id (an old palette's too), or a hex — which keeps its hue and
- * chroma and takes the mode's lightness. Null for anything else.
- */
+/** An accent colour as stored — a palette colour or a custom one — or null for anything else. */
 export function parseAccentColor(value) {
-    if (typeof value === 'string') {
-        const id = resolveColorId(value);
-        if (id)
-            return paletteAccent(id);
-        return customAccentFromHex(value);
-    }
     if (typeof value !== 'object' || value === null)
         return null;
     const obj = value;
-    if (obj.kind === 'palette' && typeof obj.id === 'string') {
-        const id = resolveColorId(obj.id);
-        return id ? paletteAccent(id) : null;
+    if (obj.kind === 'palette') {
+        return typeof obj.id === 'string' && isAppColorId(obj.id) ? paletteAccent(obj.id) : null;
     }
     if (obj.kind === 'custom' && typeof obj.hue === 'number' && typeof obj.chroma === 'number') {
         if (!Number.isFinite(obj.hue) || !Number.isFinite(obj.chroma))
@@ -98,12 +78,8 @@ export function parseAccentColor(value) {
     }
     return null;
 }
-/** The value older versions stored for "the theme's own accent". */
-const LEGACY_THEME_ACCENT = 'THEME_DEFAULT';
-/** The accent setting as stored, or as older versions stored it ({@link parseAccentColor}). */
+/** The accent setting as stored: the theme's own accent, or a colour ({@link parseAccentColor}). */
 export function parseAccentSetting(value) {
-    if (value === LEGACY_THEME_ACCENT)
-        return THEME_ACCENT;
     if (typeof value === 'object' && value !== null && value.kind === 'theme')
         return THEME_ACCENT;
     return parseAccentColor(value);

@@ -19,12 +19,6 @@ export const MATERIAL_DEFAULTS: ThemeMaterial = {
   lift: 0.5,
 }
 
-/** What older themes set instead of a material: `depth` moved the frame and the cards together. */
-export interface LegacyMaterial {
-  tone?: number
-  depth?: number
-}
-
 const unit = (value: unknown) =>
   typeof value === 'number' && Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : undefined
 
@@ -40,16 +34,7 @@ export function parseMaterial(raw: unknown): Partial<ThemeMaterial> {
   return Object.fromEntries(Object.entries(parsed).filter(([, value]) => value !== undefined)) as Partial<ThemeMaterial>
 }
 
-/** What an older theme's `tone` and `depth` meant: `depth` moved the frame and the cards together. */
-export function materialFromLegacy(legacy: { tone?: unknown; depth?: unknown }): Partial<ThemeMaterial> {
-  const depth = unit(legacy.depth)
-  return parseMaterial({ tone: legacy.tone, ...(depth !== undefined ? { frame: depth, lift: depth } : {}) })
-}
-
-/**
- * A theme's material in full: what it sets, then what an older theme set,
- * then the defaults. Read, never rewritten: a stored theme keeps its shape.
- */
-export function resolveMaterial(theme: { material?: Partial<ThemeMaterial> } & LegacyMaterial): ThemeMaterial {
-  return { ...MATERIAL_DEFAULTS, ...materialFromLegacy(theme), ...parseMaterial(theme.material) }
+/** A theme's material in full: what it sets, the defaults for the rest. */
+export function resolveMaterial(theme: { material?: Partial<ThemeMaterial> }): ThemeMaterial {
+  return { ...MATERIAL_DEFAULTS, ...parseMaterial(theme.material) }
 }

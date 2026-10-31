@@ -27,7 +27,7 @@ derived from it. Pure TypeScript with no runtime dependencies, published as ESM 
 Each depends on a tagged version of this repository:
 
 ```json
-"@todebaran/theme-kit": "github:todebaran/theme-kit#v1.0.0"
+"@todebaran/theme-kit": "github:todebaran/theme-kit#v2.0.0"
 ```
 
 The repository is public, so the package is fetched as a tarball over HTTPS —
@@ -50,5 +50,5 @@ tag has to carry what consumers import. CI (`pnpm check:dist`) fails when
 A change here changes what three deployed things believe a theme looks like, so
 the three move together. Stored gallery rows carry `facets.v`
 (`THEME_FACETS_VERSION`), so a new derivation can tell an old record from its own.
-A change to the file shape bumps `THEME_FILE_VERSION`, and `readThemeFile` keeps
-reading every older version.
+A change to the file shape bumps `THEME_FILE_VERSION`, and from the first
+public release on, `readThemeFile` has to keep reading the versions before it.

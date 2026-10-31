@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { checkThemeSubmission, parseThemeSubmission } from './submission.js'
+import { THEME_FILE_VERSION } from './themeFile.js'
 
 const part = (mode: 'light' | 'dark', background: string) => ({
   mode,
@@ -24,7 +25,7 @@ describe('parseThemeSubmission', () => {
     if (!parsed.ok) return
     expect(parsed.submission.name).toBe('Fjord')
     expect(parsed.submission.light).toEqual({
-      todebaranTheme: 3,
+      todebaranTheme: THEME_FILE_VERSION,
       name: 'Fjord',
       mode: 'light',
       background: '#eef2f5',
@@ -36,7 +37,7 @@ describe('parseThemeSubmission', () => {
 
   it('refuses what an import would forgive', () => {
     const refuse = (body: unknown) => parseThemeSubmission(body, { update: false }).ok
-    // a legacy accent string, an old palette id, a partial material, a mode that disagrees
+    // an accent as a string, an id the palette does not have, a partial material, a mode that disagrees
     expect(refuse({ name: 'x', dark: { ...part('dark', '#000000'), accent: '#ff0000' } })).toBe(false)
     expect(refuse({ name: 'x', dark: { ...part('dark', '#000000'), accent: { kind: 'palette', id: 'amber' } } })).toBe(false)
     expect(refuse({ name: 'x', dark: { ...part('dark', '#000000'), material: { tone: 0.5 } } })).toBe(false)

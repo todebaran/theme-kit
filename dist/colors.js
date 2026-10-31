@@ -28,87 +28,13 @@ export const APP_COLORS = [
     { id: 'mauve', label: 'Mauve', group: 'quiet', hue: 340, dark: { l: 0.75, c: 0.065 }, light: { l: 0.52, c: 0.085 } },
     { id: 'graphite', label: 'Graphite', group: 'quiet', hue: 262, dark: { l: 0.73, c: 0.018 }, light: { l: 0.48, c: 0.022 } },
 ];
-/**
- * Colours of the palette before it was cut down to the one above, each with
- * its successor. Folders, projects, tags and highlights keep the id they were
- * given — in synced data, which a device on an older version still writes —
- * so an old id is translated where it is read ({@link resolveColorId}), never
- * rewritten where it is stored.
- */
-export const LEGACY_COLOR_ALIASES = {
-    amber: 'brass',
-    yellow: 'brass',
-    emerald: 'green',
-    cyan: 'sky',
-    purple: 'violet',
-    fuchsia: 'orchid',
-    rose: 'red',
-    wine: 'oxblood',
-    brown: 'oxblood',
-    olive: 'sage',
-    forest: 'sage',
-    navy: 'slate',
-    gold: 'brass',
-    petrol: 'teal',
-    lavender: 'indigo',
-    plum: 'mauve',
-    taupe: 'graphite',
-    coral: 'terracotta',
-    turquoise: 'teal',
-    espresso: 'terracotta',
-    ink: 'graphite',
-    blush: 'mauve',
-    ruby: 'oxblood',
-    vermilion: 'orange',
-    peach: 'orange',
-    champagne: 'brass',
-    butter: 'brass',
-    pistachio: 'lime',
-    mint: 'green',
-    ice: 'teal',
-    powder: 'sky',
-    lilac: 'mauve',
-    silver: 'graphite',
-    cobalt: 'indigo',
-    grape: 'violet',
-    merlot: 'oxblood',
-    rust: 'terracotta',
-    aubergine: 'oxblood',
-    cerise: 'pink',
-    azure: 'sky',
-    cornflower: 'blue',
-    denim: 'slate',
-    sapphire: 'indigo',
-    prussian: 'slate',
-    ultramarine: 'indigo',
-    magenta: 'pink',
-    tangerine: 'orange',
-    chartreuse: 'lime',
-    aqua: 'teal',
-    iris: 'violet',
-    flamingo: 'pink',
-    periwinkle: 'indigo',
-    seafoam: 'teal',
-    bubblegum: 'pink',
-    lemon: 'brass',
-    apricot: 'orange',
-    rosewater: 'terracotta',
-};
 const APP_COLOR_IDS = new Set(APP_COLORS.map(color => color.id));
 export function isAppColorId(id) {
     return APP_COLOR_IDS.has(id);
 }
-/**
- * The palette colour a stored colour id stands for: itself, its successor if
- * it is an id of the old palette, or null for no colour or an id the palette
- * never had.
- */
+/** The palette colour a stored colour id names, or null for no colour or an id the palette does not have. */
 export function resolveColorId(id) {
-    if (!id)
-        return null;
-    if (isAppColorId(id))
-        return id;
-    return LEGACY_COLOR_ALIASES[id] ?? null;
+    return id && isAppColorId(id) ? id : null;
 }
 /** The palette colour with this id, after {@link resolveColorId}. */
 export function appColorSpec(id) {
