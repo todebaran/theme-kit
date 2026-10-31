@@ -27,23 +27,12 @@ derived from it. Pure TypeScript with no runtime dependencies, published as ESM 
 Each depends on a tagged version of this repository:
 
 ```json
-"@todebaran/theme-kit": "git+ssh://git@github.com/todebaran/theme-kit.git#v1.0.0"
+"@todebaran/theme-kit": "github:todebaran/theme-kit#v1.0.0"
 ```
 
-The repository is private. On a developer machine the SSH key that already
-reaches GitHub is enough. A build server (GitHub Actions, Cloudflare Workers
-Builds) has no key, so it rewrites that address to HTTPS with a read-only token
-— through git's own configuration in environment variables, so no install
-command has to change:
-
-```
-GIT_CONFIG_COUNT=1
-GIT_CONFIG_KEY_0=url.https://x-access-token:<THEME_KIT_TOKEN>@github.com/todebaran/theme-kit.git.insteadOf
-GIT_CONFIG_VALUE_0=ssh://git@github.com/todebaran/theme-kit.git
-```
-
-`<THEME_KIT_TOKEN>` is a fine-grained GitHub token with **Contents: Read-only**
-on this repository alone.
+The repository is public, so the package is fetched as a tarball over HTTPS —
+no key or token on a developer machine, in GitHub Actions or in Cloudflare
+Workers Builds. It holds the theme format and colour math, nothing secret.
 
 ## Built output is committed
 
